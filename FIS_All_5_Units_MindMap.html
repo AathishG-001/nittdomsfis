@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Institutions and Services — All 5 Units</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--surface:#161b22;--card:#1c2230;--border:#2a3446;
+  --u1:#059669;--u2:#3b82f6;--u3:#f59e0b;--u4:#8b5cf6;--u5:#ef4444;
+  --text:#cdd9ef;--muted:#566a8a;--hi:#f0f6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+/* Header */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr h1{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--hi);letter-spacing:.01em}
+.hdr p{font-size:11px;color:var(--muted);margin-top:1px}
+.unit-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.utab{padding:5px 13px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all .2s}
+.utab[data-u="u1"].act,.utab[data-u="u1"]:hover{background:var(--u1);border-color:var(--u1);color:#fff}
+.utab[data-u="u2"].act,.utab[data-u="u2"]:hover{background:var(--u2);border-color:var(--u2);color:#fff}
+.utab[data-u="u3"].act,.utab[data-u="u3"]:hover{background:var(--u3);border-color:var(--u3);color:#000}
+.utab[data-u="u4"].act,.utab[data-u="u4"]:hover{background:var(--u4);border-color:var(--u4);color:#fff}
+.utab[data-u="u5"].act,.utab[data-u="u5"]:hover{background:var(--u5);border-color:var(--u5);color:#fff}
+.utab[data-u="all"].act,.utab[data-u="all"]:hover{background:var(--hi);border-color:var(--hi);color:#000}
+/* Layout */
+.layout{display:flex;height:calc(100vh - 62px)}
+/* Tree */
+.tree-pnl{width:310px;min-width:260px;border-right:1px solid var(--border);overflow-y:auto;padding:1rem .75rem;flex-shrink:0}
+.tree-pnl::-webkit-scrollbar{width:3px}.tree-pnl::-webkit-scrollbar-thumb{background:var(--border)}
+/* Content */
+.con-pnl{flex:1;overflow-y:auto;padding:1.75rem 2rem}
+.con-pnl::-webkit-scrollbar{width:3px}.con-pnl::-webkit-scrollbar-thumb{background:var(--border)}
+/* Tree nodes */
+.tree-root,.tree-children{list-style:none}
+.tree-children{padding-left:14px;border-left:1px solid var(--border);margin-left:10px;display:none}
+.tree-children.open{display:block}
+.tl{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:7px;cursor:pointer;border:1px solid transparent;font-size:12.5px;color:var(--text);user-select:none;margin:2px 0;transition:all .15s}
+.tl:hover{background:rgba(255,255,255,.04)}
+.tl.act{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1);color:var(--hi)}
+.tl .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tl .arr{margin-left:auto;font-size:9px;color:var(--muted);transition:transform .2s}
+.tl.exp .arr{transform:rotate(90deg)}
+/* unit dot colors */
+.tl[data-u="u1"] .dot{background:var(--u1)}
+.tl[data-u="u2"] .dot{background:var(--u2)}
+.tl[data-u="u3"] .dot{background:var(--u3)}
+.tl[data-u="u4"] .dot{background:var(--u4)}
+.tl[data-u="u5"] .dot{background:var(--u5)}
+.tl[data-u="all"] .dot{background:var(--hi)}
+/* Content sections */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:80%;color:var(--muted);gap:10px}
+.placeholder .ico{font-size:40px;opacity:.2}
+.sec{display:none}.sec.act{display:block}
+/* Section header */
+.shdr{margin-bottom:1.25rem;padding-bottom:.85rem;border-bottom:1px solid var(--border)}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.b-u1{background:rgba(5,150,105,.15);color:var(--u1)}
+.b-u2{background:rgba(59,130,246,.15);color:var(--u2)}
+.b-u3{background:rgba(245,158,11,.15);color:var(--u3)}
+.b-u4{background:rgba(139,92,246,.15);color:var(--u4)}
+.b-u5{background:rgba(239,68,68,.15);color:var(--u5)}
+.shdr h2{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--hi);line-height:1.2}
+.shdr p{margin-top:5px;color:var(--muted);font-size:12px}
+/* Cards */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.85rem;margin-bottom:.85rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem}
+.card h3{font-size:12.5px;font-weight:600;color:var(--hi);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.card h3 .d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.card ul{list-style:none;padding:0}
+.card ul li{font-size:13px;color:var(--text);padding:3px 0 3px 10px;border-left:2px solid var(--border);margin-bottom:3px;line-height:1.5}
+.card ul li b,.card ul li strong{color:var(--hi);font-weight:500}
+.cful{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.85rem}
+.cful h3{font-size:12.5px;font-weight:600;color:var(--hi);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cful h3 .d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cful ul{list-style:none;padding:0}
+.cful ul li{font-size:13px;color:var(--text);padding:3px 0 3px 10px;border-left:2px solid var(--border);margin-bottom:3px;line-height:1.5}
+.cful ul li b,.cful ul li strong{color:var(--hi);font-weight:500}
+/* Tables */
+.tw{overflow-x:auto;margin-bottom:.85rem}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:rgba(255,255,255,.03);color:var(--muted);font-weight:500;padding:7px 11px;text-align:left;border-bottom:1px solid var(--border);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:7px 11px;border-bottom:1px solid rgba(42,52,70,.5);color:var(--text);vertical-align:top}
+tr:last-child td{border-bottom:none}
+/* Pill grid */
+.pgrid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:.85rem}
+.pill{padding:4px 12px;border-radius:16px;font-size:11.5px;border:1px solid var(--border);color:var(--text);background:var(--card)}
+.pill.g{border-color:rgba(5,150,105,.4);color:var(--u1);background:rgba(5,150,105,.08)}
+.pill.b{border-color:rgba(59,130,246,.4);color:var(--u2);background:rgba(59,130,246,.08)}
+.pill.a{border-color:rgba(245,158,11,.4);color:var(--u3);background:rgba(245,158,11,.08)}
+.pill.p{border-color:rgba(139,92,246,.4);color:var(--u4);background:rgba(139,92,246,.08)}
+.pill.r{border-color:rgba(239,68,68,.4);color:var(--u5);background:rgba(239,68,68,.08)}
+/* Tabs */
+.ctabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.85rem}
+.ctab{padding:4px 12px;border-radius:5px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11.5px;cursor:pointer;transition:all .15s;font-family:'IBM Plex Sans',sans-serif}
+.ctab.act{border-color:rgba(255,255,255,.2);color:var(--hi);background:rgba(255,255,255,.06)}
+.ctc{display:none}.ctc.act{display:block}
+/* Section label */
+.slbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.25rem 0 .5rem}
+.slbl:first-child{margin-top:0}
+/* Alert */
+.alert{padding:9px 13px;border-radius:7px;font-size:12.5px;margin-bottom:.85rem;border-left:3px solid}
+.alert-g{background:rgba(5,150,105,.08);border-color:var(--u1);color:#34d399}
+.alert-a{background:rgba(245,158,11,.08);border-color:var(--u3);color:#fbbf24}
+.alert-b{background:rgba(59,130,246,.08);border-color:var(--u2);color:#60a5fa}
+@media(max-width:700px){.layout{flex-direction:column;height:auto}.tree-pnl{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:42vh}.hdr{flex-direction:column;align-items:flex-start;gap:8px}.cgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><h1>Financial Institutions &amp; Services</h1><p>All 5 Units · Dr. J. Kirubakaran · DoMS, NIT Tiruchirappalli</p></div>
+  <div class="unit-tabs">
+    <button class="utab act" data-u="all" onclick="filterU(this)">All</button>
+    <button class="utab" data-u="u1" onclick="filterU(this)">Unit I</button>
+    <button class="utab" data-u="u2" onclick="filterU(this)">Unit II</button>
+    <button class="utab" data-u="u3" onclick="filterU(this)">Unit III</button>
+    <button class="utab" data-u="u4" onclick="filterU(this)">Unit IV</button>
+    <button class="utab" data-u="u5" onclick="filterU(this)">Unit V</button>
+  </div>
+</div>
+<div class="layout">
+<div class="tree-pnl"><ul class="tree-root" id="tree"></ul></div>
+<div class="con-pnl" id="cpnl">
+  <div class="placeholder" id="ph"><div class="ico">🗺</div><p>Select any topic from the tree to view notes</p></div>
+
+<!-- ════════════════ UNIT I ════════════════ -->
+<div class="sec" id="s-finsystem">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Financial System</h2><p>Definition, structure, significance, advantages</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Definition</h3><ul><li>System for <strong>mobilisation of savings</strong> of the public and providing funds for production of goods/services</li><li>An <strong>institutional framework</strong> existing in a country to enable financial transactions</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>3 Main Parts</h3><ul><li><strong>Financial Assets:</strong> loans, deposits, bonds, equities</li><li><strong>Financial Institutions:</strong> banks, mutual funds, insurance companies</li><li><strong>Financial Markets:</strong> money market, capital market, forex market</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Regulation</h3><ul><li><strong>RBI</strong> — Banking &amp; Money Market</li><li><strong>SEBI</strong> — Securities &amp; Capital Markets</li><li><strong>IRDA</strong> — Insurance</li><li><strong>FMC</strong> — Forward/Commodity Markets</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Significance — 5 Functions</h3><div class="pgrid"><span class="pill g">Leads to Savings</span><span class="pill g">Meets Fund Requirements of Business via Financial Markets</span><span class="pill g">Enables Investment → Production</span><span class="pill g">Leads to Capital Formation</span><span class="pill g">Brings Economic Growth</span></div></div>
+  <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>11 Advantages of Financial System</h3><ul><li>Provision of liquidity</li><li>Mobilization of savings</li><li>Size transformation / Capital formation</li><li>Maturity transformation</li><li>Risk transformation</li><li>Lowering of cost of transaction</li><li>Payment mechanism</li><li>Enable better decision making</li><li>Meet short and long term financial needs</li><li>Provide necessary finance to the Government</li><li>Accelerate the process of economic growth of the country</li></ul></div>
+</div>
+
+<div class="sec" id="s-indfs">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Indian Financial System</h2><p>Formal vs Informal structure</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Formal System Components</h3><ul><li>Financial Markets</li><li>Financial Instruments</li><li>Financial Services</li><li>Financial Institutions</li><li>Financial Regulators (MoF, SEBI, RBI, IRDA)</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Informal System</h3><ul><li>Money lenders, Local bankers</li><li>Traders, Landlords, Pawn Brokers</li><li>Private finance companies &amp; chit funds (not RBI controlled)</li><li>RBI issued NBFC (RB) Directions, 1998 to control them</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u2)"></span>All-India Financial Institutions (DFIs)</h3><div class="pgrid"><span class="pill b">IFCI</span><span class="pill b">IDBI</span><span class="pill b">SIDBI</span><span class="pill b">IDFC</span><span class="pill b">NABARD</span><span class="pill b">EXIM Bank</span><span class="pill b">NHB</span></div></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>State-level Institutions</h3><ul><li>SFCs — State Financial Corporations</li><li>SIDCs — State Industrial Development Corporations</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Other Institutions</h3><ul><li><strong>ECGC</strong> — Export Credit Guarantee Corporation of India</li><li><strong>DICGC</strong> — Deposit Insurance and Credit Guarantee Corporation</li><li><strong>OTC</strong> — Over the Counter</li><li><strong>NHB</strong> — National Housing Bank</li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-instruments">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Financial Assets / Instruments</h2><p>Definition, classification, and all types</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Marketable Assets</h3><ul><li>Shares</li><li>Government Securities</li><li>Bonds</li><li>Mutual Funds / Units of UTI</li><li>Bearer Debentures</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Non-Marketable Assets</h3><ul><li>Bank Deposits</li><li>Provident Funds</li><li>LIC Policies</li><li>Company Deposits</li><li>Post Office Certificates</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>By Purpose</h3><ul><li><strong>For savers:</strong> Deposits, Equities, MF Units</li><li><strong>For borrowers:</strong> Loans, Overdrafts</li><li><strong>Govt instruments:</strong> Bonds, T-Bills, PPF, KVP</li></ul></div>
+  </div>
+  <div class="slbl">Capital Market Instruments</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Equity Shares</h3><ul><li>Part of total capital (Companies Act, 1956)</li><li>Entitled to dividend and <strong>voting right</strong></li><li>Bear risk of corporate performance</li><li>Issued in primary market; traded in secondary via stock exchanges</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Preference Shares</h3><ul><li>Limited risk; <strong>predetermined dividend</strong></li><li><strong>No voting rights</strong></li><li>Priority in capital repayment over equity shareholders</li><li>Marketable but not widely traded (fixed dividend)</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Bonds/Debentures</h3><ul><li>Debt instruments; fixed interest bearing</li><li>Issued by corporates, govts, DFIs</li><li>Negotiable; transferable by endorsement</li><li>Can be issued with or without security</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>GDR</h3><ul><li>Internationally traded equity instruments against equity shares</li><li>Fixed ratio of Indian shares quoted on BSE</li><li>Issued by international depository</li><li>Denominated in <strong>US Dollars</strong></li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>ADR</h3><ul><li>Similar to GDR; traded in <strong>US markets</strong></li><li>Denominated in US Dollars</li><li>Under FCCB &amp; Ordinary Shares (Depository Receipt Mechanism) Scheme, <strong>1993</strong></li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-finmarkets">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Financial Markets</h2><p>Classification and all types</p></div>
+  <div class="card" style="margin-bottom:.85rem"><h3><span class="d" style="background:var(--u1)"></span>Definition</h3><ul><li>Market where entities trade financial securities at low transaction costs at prices reflecting supply &amp; demand</li><li>Transfers funds from <strong>surplus units to deficit units</strong></li><li>Link between savers and investors — <strong>NOT a source of finance</strong></li></ul></div>
+  <div class="slbl">6 Classification Bases</div>
+  <div class="tw"><table><tr><th>Basis</th><th>Types</th></tr><tr><td>Maturity of claims</td><td>Money Market (short-term) · Capital Market (long-term)</td></tr><tr><td>Seasoning of claim</td><td>Primary Market · Secondary Market</td></tr><tr><td>Structure/Arrangements</td><td>Organised Markets · Unorganised Markets</td></tr><tr><td>Type of financial claim</td><td>Debt Market · Equity Market</td></tr><tr><td>Timing of delivery</td><td>Cash/Spot Market · Forward/Future Market</td></tr><tr><td>Other Types</td><td>Foreign Exchange Market · Derivatives Market</td></tr></table></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Organised Markets</h3><ul><li>Standardised rules and regulations</li><li>High degree of institutionalisation</li><li>Strict supervision by RBI or regulatory bodies</li><li><strong>Includes:</strong> Capital Market + Money Market</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Unorganised Markets</h3><ul><li>Money lenders, indigenous bankers, traders</li><li>Private finance companies, chit funds</li><li>Not controlled by RBI</li><li>RBI issued NBFC (RB) Directions, 1998</li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-capitalmarket">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Capital Market</h2><p>Structure, importance, primary, secondary markets</p></div>
+  <div class="ctabs">
+    <button class="ctab act" onclick="ct(this,'cm-ov')">Overview</button>
+    <button class="ctab" onclick="ct(this,'cm-st')">Structure</button>
+    <button class="ctab" onclick="ct(this,'cm-pm')">Primary Market</button>
+    <button class="ctab" onclick="ct(this,'cm-sm')">Secondary Market</button>
+    <button class="ctab" onclick="ct(this,'cm-gs')">Govt Securities</button>
+    <button class="ctab" onclick="ct(this,'cm-lt')">Long-term Loans</button>
+  </div>
+  <div class="ctc act" id="cm-ov">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Definition</h3><ul><li>Market for <strong>long-term finance</strong> (maturity &gt; 1 year)</li><li>Buying and selling equity, debt and other securities</li><li>Focus on financing of <strong>fixed investments</strong></li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Participants</h3><ul><li>Mutual Funds, Insurance organisations</li><li>Foreign Institutional Investors (FIIs)</li><li>Corporates and Individuals</li><li>Issuers, Stock Exchange, Merchant Bankers, Depositories, Stock Brokers, Market Regulator</li></ul></div>
+    </div>
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>6 Importance Points</h3><ul><li>Mobilises savings; avoids wastage in unproductive uses</li><li>Provides incentive to saving; facilitates capital formation through rates of interest</li><li>Avenue for investors (particularly household sector) in financial assets more productive than physical assets</li><li>Facilitates increase in production and productivity → enhances economic welfare</li><li>Promotes economic growth</li><li>Stability in values of securities representing capital funds</li></ul></div>
+  </div>
+  <div class="ctc" id="cm-st">
+    <div class="cful"><h3><span class="d" style="background:var(--u2)"></span>Indian Capital Market Structure</h3><ul><li><strong>Government Securities Market</strong> (Gilt-Edged)</li><li><strong>Industrial Securities Market</strong> → New Issues Market + Secondary Market</li><li><strong>Development Financial Institutions:</strong> IFCI, ICICI, SFCs, IDBI, IIBI, UTI</li><li><strong>Financial Intermediaries:</strong> Merchant Banks, Mutual Funds, Leasing Companies, Venture Capital Companies, Others</li></ul></div>
+    <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Industrial Securities Market</h3><ul><li>Market for shares and debentures of existing and new Corporate firms</li><li>Instruments: Equity shares, Preference shares, Debentures/Bonds</li><li>Sub-divided into: <strong>Primary Market (New Issue Market)</strong> + <strong>Secondary Market (Stock Exchange)</strong></li></ul></div>
+  </div>
+  <div class="ctc" id="cm-pm">
+    <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Primary / New Issue Market</h3><ul><li>Market for <strong>new issues</strong> — fresh capital; securities issued to public for first time</li><li>Does <strong>not have any organisational setup</strong></li><li>Both new and existing companies can issue here</li><li>Performs <strong>triple-service function: Origination, Underwriting, Distribution</strong></li><li>Facilitates capital formation</li></ul></div>
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>3 Methods of Raising Capital</h3><ul><li><strong>Public Issue:</strong> Issuing shares to the general public</li><li><strong>Rights Issue:</strong> Issuing shares to the existing shareholders</li><li><strong>Private Placement:</strong> Issuing shares to selected group of investors based on pre-agreement</li></ul></div>
+  </div>
+  <div class="ctc" id="cm-sm">
+    <div class="cful"><h3><span class="d" style="background:var(--u2)"></span>Secondary Market / Stock Market</h3><ul><li>Market for <strong>old issues</strong> — buying and selling of already-issued securities</li><li>Operates through <strong>Stock Exchanges</strong></li><li>Regulated under <strong>Securities Contracts (Regulation) Act, 1956</strong></li><li><strong>Bombay Stock Exchange (BSE)</strong> is the principal stock exchange in India</li></ul></div>
+  </div>
+  <div class="ctc" id="cm-gs">
+    <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Government Securities Market (Gilt-Edged)</h3><ul><li>Long-term Govt securities traded here; short-term traded in money market</li><li>Securities of: Central Govt, State Govts, Semi-Govt authorities (City Corporations, Port Trusts, State Electricity Boards), All India &amp; State-level FIs, Public Sector Enterprises</li></ul></div>
+  </div>
+  <div class="ctc" id="cm-lt">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Long-term Loans Market — 3 Sub-markets</h3><ul><li><strong>Term Loans Market:</strong> Industrial financing institutions; Govt created at national &amp; regional level; help identify investment opportunities, support new entrepreneurs, modernisation. Key: IDBI, IFCI, ICICI, SFCs</li><li><strong>Mortgages Market:</strong> Institutions providing mortgage loans mainly to individuals</li><li><strong>Financial Guarantees Market:</strong> Institutions providing financial guarantees; insurance companies are major participants</li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-moneymarket">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Money Market</h2><p>Call money, T-Bills, Commercial Bills, CD, Commercial Paper</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Definition</h3><ul><li>Market for <strong>short-term finance</strong> (maturity &lt; 1 year)</li><li>Trades: Trade Bills, Promissory Notes, Short-term Govt Papers</li><li>Organised money market: RBI, Banks (commercial and co-operative)</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Purpose — Banks Borrow to:</h3><ul><li>Fill temporary gaps / mismatch of funds</li><li>Meet <strong>CRR and SLR</strong> mandatory requirements stipulated by RBI</li><li>Meet sudden demand (e.g. advance tax payments)</li></ul></div>
+  </div>
+  <div class="ctabs">
+    <button class="ctab act" onclick="ct(this,'mm-cm')">Call Money</button>
+    <button class="ctab" onclick="ct(this,'mm-bl')">Bill Market</button>
+    <button class="ctab" onclick="ct(this,'mm-bk')">Bank Loans / CD</button>
+    <button class="ctab" onclick="ct(this,'mm-cp')">Commercial Paper</button>
+  </div>
+  <div class="ctc act" id="mm-cm">
+    <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Call Money Market</h3><ul><li>Day-to-day surplus funds of banks traded here</li><li><strong>Call money:</strong> 1 day | <strong>Notice money:</strong> 2–14 days | <strong>Term money:</strong> &gt;15 days</li><li>Exclusively limited to banks temporarily short of funds</li><li>Clean basis — <strong>no collateral required</strong></li><li>Participants (both borrow &amp; lend): RBI (via LAF), Banks, Primary Dealers</li><li>Pure <strong>inter-bank market since August 2005</strong></li><li>Highly competitive and sensitive; good indicator of <strong>liquidity position</strong></li></ul></div>
+  </div>
+  <div class="ctc" id="mm-bl">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Treasury Bills (T-Bills)</h3><ul><li>Short-term liabilities of Govt of India</li><li>Tenors: <strong>91-day, 182-day, 364-day</strong></li><li>Issued at <strong>discount to face value</strong>; face value paid at maturity</li><li>Rate of discount determined at each auction</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Commercial Bills</h3><ul><li>Works like Bill of Exchange</li><li>Businesses issue for short-term money requirements</li><li>Not as developed in India as T-Bill market</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="mm-bk">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Short-term Bank Loans</h3><ul><li>Commercial banks provide overdrafts and cash credits</li><li>For working capital requirements of traders and industrialists</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Certificate of Deposit (CD)</h3><ul><li>Negotiable term deposit accepted by commercial banks</li><li>Issued through a promissory note</li><li>Issued to: individuals, corporations, trusts</li><li>Can be issued at a <strong>discount</strong> by scheduled commercial banks</li><li>Duration: <strong>3 months to 1 year</strong></li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="mm-cp">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Commercial Paper (CP)</h3><ul><li>Issued by corporates for short-term working capital requirements</li><li>Alternative to borrowing from a bank</li><li>Period: <strong>15 days to 1 year</strong></li><li>Issued at <strong>discount to face value</strong>; market decides discount rate</li><li>Requires <strong>RBI's prior approval</strong></li><li><strong>Minimum size:</strong> Rs. 5 lakhs and multiples thereof</li><li><strong>Maximum size:</strong> 100% of the issuer's working capital</li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-growth">
+  <div class="shdr"><span class="badge b-u1">Unit I</span><h2>Growth of Financial System in India</h2><p>Nationalisation, Development Banks, key milestones with years</p></div>
+  <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Nationalisation Timeline</h3><div class="tw"><table><tr><th>Year</th><th>Event</th></tr><tr><td>1935</td><td>RBI established as private sector central bank</td></tr><tr><td>1948</td><td>RBI nationalised</td></tr><tr><td>1955</td><td>Imperial Bank of India nationalised → renamed <strong>State Bank of India</strong></td></tr><tr><td>1956</td><td>245 life insurance entities (154 companies + 16 foreign + 75 provident) → merged → <strong>LIC formed</strong></td></tr><tr><td>1963</td><td>ARDC established — minor irrigation, farm mechanization, land development, horticulture, dairy</td></tr><tr><td>1982</td><td>NABARD established; ARDC merged into it. Also EXIM Bank established — took over International Finance Wing of IDBI</td></tr><tr><td>1987</td><td>SHCIL established — quick share transfer, clearing, depository, MIS services</td></tr></table></div></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Development Banks</h3><ul><li>Medium &amp; long-term finance for agriculture &amp; industrial development</li><li>Also: project identification, technical advice, managing units</li><li><strong>Key:</strong> IFCI, SFC, ICICI, IDBI, SIDBI</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Mutual Funds &amp; Credit Rating</h3><ul><li>Both private and public sector FIs encouraged to float mutual funds and venture capital</li><li><strong>CRISIL</strong> — Credit Rating and Information Services of India Ltd.</li><li><strong>ICRA</strong> — Investment Information and Credit Rating Agency</li><li><strong>CARE</strong> — Credit Analysis and Research Ltd.</li></ul></div>
+  </div>
+</div>
+
+<!-- ════════════════ UNIT II ════════════════ -->
+<div class="sec" id="s-fi-overview">
+  <div class="shdr"><span class="badge b-u2">Unit II</span><h2>Financial Institutions — Overview</h2><p>Definition, functions, benefits, classification</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Definition</h3><ul><li>Institution that provides financial services</li><li>Financial services = transfer of financial resources from savers/investors to users/borrowers</li><li>All organisations which <strong>intermediate and facilitate</strong> financial transactions</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>3 Core Functions</h3><ul><li>Mobilise the savings of the public</li><li>Provide credit facility to the needy persons</li><li>Render financial services — transfer of funds, payment mechanism</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>5 Key Benefits</h3><ul><li>Enable transferring of funds from investors to corporate customers</li><li>Facilitate flow of money across the country</li><li>Enable economy of large-scale operations</li><li>Reduce cost of transaction by increasing number of transactions</li><li>Reduce risk of loss through diversification to different industries</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Classification (3 Types)</h3><ul><li><strong>a) Banking Institutions</strong></li><li><strong>b) Non-Banking Financial Institutions (NBFCs)</strong></li><li><strong>c) Mutual Funds</strong></li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-banking">
+  <div class="shdr"><span class="badge b-u2">Unit II</span><h2>Banking Institutions</h2><p>All 7 types — full definitions</p></div>
+  <div class="alert alert-g">Banking business = accepting deposits from the public for the purpose of lending or investment, repayable on demand.</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>1. Commercial Banks</h3><ul><li>Finance for <strong>working capital</strong> (day-to-day: raw materials, salaries)</li><li>Raise funds through various kinds of deposits</li><li>Lend short and medium-term loans to traders and business persons</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Scheduled Banks (sub-type)</h3><ul><li>Registered in <strong>2nd Schedule of RBI</strong></li><li>Must carry banking business in India</li><li>Paid-up capital and reserves ≥ <strong>Rs. 5 lakhs</strong></li><li>Must not conduct affairs detrimental to depositors</li><li>Under direct purview of RBI credit control; entitled to borrowing &amp; rediscounting</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>2. Industrial / Investment Banks</h3><ul><li>Finance for <strong>fixed capital</strong> (land, building, plant, machinery, furniture)</li><li>Raise funds through shares, debentures, bonds</li><li>Lend medium and long-term loans to industrialists</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>3. Exchange Banks</h3><ul><li>Specialise in financing foreign trade</li><li>Deal with foreign exchange transactions</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>4. Co-operative Banks</h3><ul><li>Formed on principle of <strong>mutual co-operation</strong></li><li>Members from same activity (farming, retailing, small industry)</li><li>Lend at generally <strong>low rate of interest</strong></li><li>Significant role in agricultural and allied activities</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>5. Land Development Banks</h3><ul><li>Formed by agriculturists on mutual cooperation principle</li><li>Raise funds through shares, debentures, bonds</li><li>Loans for tools, equipment, permanent land improvement, cattle farming</li><li>Now called <strong>Agriculture and Rural Development Banks</strong></li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>6. Regional Rural Banks (RRBs)</h3><ul><li>Govt-sponsored under <strong>RRB Act, 1976</strong></li><li>Shareholding: <strong>Central Govt 50% : Sponsoring Bank 35% : State Govt 15%</strong></li><li>Hybrid: cooperative local orientation + commercial banking culture</li><li>Customers: small farmers, agricultural labourers, socio-economically weaker sections</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>7. Savings Banks</h3><ul><li>Mobilise savings of poor and middle income people</li><li>Primary objective: promote <strong>habit of thrift and savings</strong></li><li>Restrictions on number &amp; amount of withdrawals per period</li><li>In India, run through <strong>postal department</strong></li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-centralbank">
+  <div class="shdr"><span class="badge b-u2">Unit II</span><h2>Central Bank (RBI)</h2><p>All main, promotional, and supervisory functions</p></div>
+  <div class="card" style="margin-bottom:.85rem"><h3><span class="d" style="background:var(--u2)"></span>Definition</h3><ul><li>Supervises, controls, and regulates banking and non-banking financial institutions</li><li>Acts as leader of money market; enforces monetary discipline; manages currency issue; controls bank deposits; safeguards financial stability</li><li>Serves as <strong>banker, agent, and advisor to government</strong></li><li>Apex bank of the country</li></ul></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>10 Main Functions</h3><ul><li>Monopoly of note issue</li><li>Banker to government</li><li>Agent and advisor to government</li><li>Banker to banks</li><li>Act as national clearing house</li><li>Lender of last resort</li><li>Controller of credit</li><li>Foreign exchange management</li><li>Exchange control</li><li>Publication of information</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>5 Promotional Functions</h3><ul><li>Promotion of banking habits</li><li>Provide refinance for export promotion</li><li>Provide facilities for agricultural activities</li><li>Provide facilities for small scale industries</li><li>Provide help to co-operative sector</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>4 Supervisory Functions</h3><ul><li>Granting of licence to banks</li><li>Supervising and inspecting financial institutions</li><li>Implementing deposit insurance scheme</li><li>Controlling financial institutions</li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-nbfc">
+  <div class="shdr"><span class="badge b-u2">Unit II</span><h2>Non-Banking Financial Companies (NBFCs)</h2><p>Dual classification, services, regulation</p></div>
+  <div class="card" style="margin-bottom:.85rem"><h3><span class="d" style="background:var(--u2)"></span>Definition &amp; Key Distinctions from Banks</h3><ul><li>Specialised FI other than a banking institution; mobilises savings of a certain segment; lends for specialised needs</li><li>Can accept deposits — but <strong>NOT demand deposits</strong></li><li>Cannot issue cheques | Cannot borrow from RBI</li><li>Flexible structure: tailor-made services</li></ul></div>
+  <div class="slbl">RBI Classification — 3 Categories</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Asset Financing Companies</h3><ul><li>Finance for physical assets — automobiles, tractors, earth-moving equipment</li><li><strong>Examples:</strong> Bajaj Auto Finance, Shriram Finance, Fullerton India</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Investment Companies</h3><ul><li>Acquire and trade in securities (shares, stocks, bonds, debentures)</li><li>Pool investment from investors</li><li><strong>Examples:</strong> ICICI Prudential MF, Nippon India MF, HDFC MF</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Loan Companies</h3><ul><li>Give loans — housing loans, gold loans</li><li><strong>Examples:</strong> Muthoot Finance, Manappuram Gold Finance, HDFC, LIC Housing</li></ul></div>
+  </div>
+  <div class="slbl">General Classification — 4 Categories</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Development Institutions</h3><ul><li>Long-term finance for agriculture and industrial development</li><li>Multipurpose: project identification, technical advice, underwriting, promotion</li><li><strong>Examples:</strong> IFCI, SIDBI, SFCs, SIDC</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Specialised Institutions</h3><ul><li>Assistance to special sectors: housing, infrastructure, agriculture</li><li>Generally do <strong>NOT accept public deposits</strong></li><li><strong>Examples:</strong> NABARD, NHB, NHAI, EXIM Bank</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Investment Institutions</h3><ul><li>Acquire and trade in securities in capital market</li><li>Mobilise savings in forms other than demand deposits</li><li><strong>Examples:</strong> LIC, GIC, UTI</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Other Institutions</h3><ul><li>Core Investment Companies</li><li>Micro Financing Institutions</li><li>Equipment Leasing Companies</li><li>Hire Purchasing Finance Companies</li><li>Housing Finance Companies</li><li>Nidhi Companies, Chit Fund Companies</li></ul></div>
+  </div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>9 Services Rendered by NBFCs</h3><ul><li>Mobilisation of savings through attractive schemes and rates</li><li>Timely provision of adequate credit facility easily and simply</li><li>Act as financial supermarket for diversified credit</li><li>Channelise funds for productive purposes (capital intensive industries)</li><li>Encourage thrift and savings habit</li><li>Enable asset creation through housing finance</li><li>Increase standard of living through instalment facilities for consumer durables</li><li>Render expert advice on investment of funds</li><li>Promote economic development by providing wider choice</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Regulation of NBFCs</h3><ul><li>Mandatory: Certificate of registration + minimum net owned funds</li><li>Ceilings: acceptance of deposits, capital adequacy, credit rating, net-owned funds</li><li>RBI entrusted with comprehensive supervisory system</li><li>Statutory auditors must report all non-compliance</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Key Institutions for Study</h3><div class="pgrid"><span class="pill b">IDBI</span><span class="pill b">ICICI</span><span class="pill b">SFC</span><span class="pill b">SIDC</span><span class="pill b">SIDBI</span><span class="pill a">LIC</span><span class="pill a">EXIM Bank</span><span class="pill a">IDFC</span><span class="pill a">UTI</span></div></div>
+</div>
+
+<div class="sec" id="s-regulators">
+  <div class="shdr"><span class="badge b-u2">Unit II</span><h2>Regulatory Bodies</h2><p>Ministry of Finance, SEBI, PFRDA, IRDA, FMC</p></div>
+  <div class="ctabs">
+    <button class="ctab act" onclick="ct(this,'r-mof')">Ministry of Finance</button>
+    <button class="ctab" onclick="ct(this,'r-sebi')">SEBI</button>
+    <button class="ctab" onclick="ct(this,'r-pfrda')">PFRDA</button>
+    <button class="ctab" onclick="ct(this,'r-irda')">IRDA</button>
+    <button class="ctab" onclick="ct(this,'r-fmc')">FMC</button>
+    <button class="ctab" onclick="ct(this,'r-struct')">Reg. Structure</button>
+  </div>
+  <div class="ctc act" id="r-mof">
+    <div class="cful"><h3><span class="d" style="background:var(--u2)"></span>Ministry of Finance</h3><ul><li>Concerned with taxation, financial legislation, FIs, capital markets, centre &amp; state finances, Union Budget</li><li>Cadre controlling authority of: Indian Revenue Service, Indian Economic Service, Indian Cost Accounts Service, Indian Civil Accounts Service</li></ul></div>
+    <div class="slbl">5 Departments</div>
+    <div class="pgrid"><span class="pill b">Department of Economic Affairs</span><span class="pill b">Department of Expenditure</span><span class="pill b">Department of Revenue</span><span class="pill b">Department of Disinvestment</span><span class="pill b">Department of Financial Services</span></div>
+  </div>
+  <div class="ctc" id="r-sebi">
+    <div class="card" style="margin-bottom:.85rem"><h3><span class="d" style="background:var(--u2)"></span>SEBI Overview</h3><ul><li>Securities and Exchange Board of India — nodal agency to regulate securities market</li><li>Regulates investment products; protects investors; ensures steady flow of funds</li></ul></div>
+    <div class="slbl">SEBI Organisational Structure</div>
+    <div class="tw"><table><tr><th>Role</th><th>Appointment</th></tr><tr><td>Chairman</td><td>Appointed by Government of India</td></tr><tr><td>Two Members</td><td>Officers from Union Finance Ministry</td></tr><tr><td>One Member</td><td>From Reserve Bank of India</td></tr><tr><td>Five Members</td><td>Appointed by Union Government of India</td></tr></table></div>
+    <div class="slbl">3 Primary Functions</div>
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Protective Functions</h3><ul><li>Checking price rigging</li><li>Prevent insider trading</li><li>Promote fair practices</li><li>Create awareness among investors</li><li>Prohibit fraudulent and unfair trade practices</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Regulatory Functions</h3><ul><li>Guidelines and code of conduct for intermediaries and corporate</li><li>Regulation of takeover of companies</li><li>Conducting inquiries and audit of exchanges</li><li>Registration of brokers, sub-brokers, merchant bankers</li><li>Register and regulate credit rating agencies</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Development Functions</h3><ul><li>Imparting training to intermediaries</li><li>Promotion of fair trading; reduction of malpractices</li><li>Carry out research work</li><li>Encouraging self-regulating organisations</li><li>Financial literacy awareness programmes</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="r-pfrda">
+    <div class="cful"><h3><span class="d" style="background:var(--u4)"></span>PFRDA — Pension Fund Regulatory and Development Authority</h3><ul><li>Established in <strong>2003</strong> by Indian Government; authorised by Finance Ministry</li><li>Promotes income security of old age by regulating and developing pension funds</li><li>Protects interest of subscribers associated with pension schemes</li><li>Responsible for appointment of pension fund managers, NPS Trustee Bank, and other intermediaries</li></ul></div>
+  </div>
+  <div class="ctc" id="r-irda">
+    <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>IRDA — Insurance Regulatory and Development Authority</h3><ul><li>Formed by <strong>IRDA Act 1999</strong> (amended 2002)</li><li>Headquartered in <strong>Hyderabad</strong></li><li>Regulates all private and public sector insurance business in India</li><li>Issues guidelines for various insurance companies</li><li>Regulates insurance companies to direct them to work in public interest</li></ul></div>
+  </div>
+  <div class="ctc" id="r-fmc">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>FMC — Forward Markets Commission</h3><ul><li>Chief regulator of commodity futures market (MCX, NCDEX, NMCE, UCX)</li><li>Headquartered in Mumbai; works with Finance Ministry</li><li>Main aim: advise Central Govt on matters of <strong>Forwards Contracts Act, 1952</strong></li></ul></div>
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>NABARD</h3><ul><li>Supervises regional rural banks</li><li>Supervises state and district cooperative banks</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u2)"></span>NHB</h3><ul><li>Regulates housing finance companies</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>SIDBI</h3><ul><li>Regulates state finance corporations</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="r-struct">
+    <div class="tw"><table><tr><th>Regulator</th><th>Entities Regulated</th></tr><tr><td>RBI</td><td>Commercial Banks, Urban Cooperative Banks, State &amp; District Central Cooperative Banks, NBFCs incl. primary dealers, Govt Securities Market, Money Market, Foreign Exchange Market</td></tr><tr><td>IRDA</td><td>Insurance Companies — Public &amp; Private Sector; Life and Non-Life</td></tr><tr><td>SEBI</td><td>Capital Market, Intermediaries, Mutual Funds incl. UTI, Venture Capital, FIIs, Corporate Bond Market</td></tr><tr><td>State Govts</td><td>Urban Cooperative Banks, SFCs, SIDCs</td></tr><tr><td>SIDBI</td><td>SFCs, SIDCs</td></tr><tr><td>NABARD</td><td>Rural Cooperative Banks, Regional Rural Banks</td></tr></table></div>
+  </div>
+</div>
+
+<div class="sec" id="s-regprinciples">
+  <div class="shdr"><span class="badge b-u2">Unit II</span><h2>Principles for Effective Regulation</h2><p>7 principles for effective regulation of the financial system</p></div>
+  <div class="cful"><ul><li><strong>1. Capital &amp; Liquidity:</strong> Ensure all FIs have enough capital and liquidity so risk of failure is very low — foster resiliency</li><li><strong>2. Senior Management Regulation:</strong> Regulatory measures on senior management to prevent detrimental decisions</li><li><strong>3. Innovation with Restriction:</strong> Facilitate innovation — financial products must comply with rules and regulations</li><li><strong>4. International Standards:</strong> Ensure international standards are followed</li><li><strong>5. Effective Resolution Regime:</strong> Allow insolvent firms to fail without threatening the national financial system and without taxpayer support</li><li><strong>6. Prudent Use of Resources:</strong> Financial resources used in the most prudent and effective way — efficiency and economy</li><li><strong>7. Strict Supervision:</strong> Strict supervision on the financial market to minimise harmful effects of competition</li></ul></div>
+</div>
+
+<!-- ════════════════ UNIT III ════════════════ -->
+<div class="sec" id="s-mutualfunds">
+  <div class="shdr"><span class="badge b-u3">Unit III</span><h2>Mutual Funds</h2><p>Meaning, structure, classification, investment modes</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Definition</h3><ul><li>Professionally managed collective investment scheme that pools money from many investors</li><li>Invests in stocks, bonds, short-term money market instruments and other securities</li><li>Fund manager invests on behalf of investors by buying/selling stocks, bonds etc.</li><li>Investors are <strong>joint beneficial owners</strong> in the trust</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Why MFs? (Problems with Direct Investment)</h3><ul><li>Spending time to find company performance</li><li>Understanding future business prospects</li><li>Finding track record of promoters</li><li>Analysing dividend and bonus issue history</li><li>MFs solve all these — professional management</li></ul></div>
+  </div>
+  <div class="slbl">Classification of Mutual Funds</div>
+  <div class="ctabs">
+    <button class="ctab act" onclick="ct(this,'mf-struct')">By Structure</button>
+    <button class="ctab" onclick="ct(this,'mf-obj')">By Objective</button>
+    <button class="ctab" onclick="ct(this,'mf-style')">By Style</button>
+    <button class="ctab" onclick="ct(this,'mf-goal')">By Goal</button>
+    <button class="ctab" onclick="ct(this,'mf-risk')">By Risk</button>
+    <button class="ctab" onclick="ct(this,'mf-spec')">Specialised</button>
+    <button class="ctab" onclick="ct(this,'mf-mode')">Investment Modes</button>
+    <button class="ctab" onclick="ct(this,'mf-plan')">Plans</button>
+  </div>
+  <div class="ctc act" id="mf-struct">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Open Ended Funds</h3><ul><li>No fixed maturity date</li><li>Accept continuous sale and re-purchase requests</li><li>Transactions are NAV-based</li><li>Unit capital is not fixed</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Closed Ended Funds</h3><ul><li>Run for a specific period</li><li>Offered in an NFO (New Fund Offer) but closed for further purchases after NFO</li><li>Unit capital is kept constant</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Interval Funds</h3><ul><li>Variant of closed-ended funds</li><li>Becomes open-ended at specific intervals</li><li>Have to be mandatorily listed</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="mf-obj">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Debt Funds</h3><ul><li>Invest in short and long-term debt instruments</li><li>Aim to provide <strong>regular income</strong></li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Equity Funds</h3><ul><li>Invest in equity securities</li><li>Aim to provide <strong>growth and capital appreciation</strong> over long term</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Hybrid Funds</h3><ul><li>Invest in combination of equity and debt securities</li><li>Proportion of equity and debt may vary</li><li>Aim to provide for both income and capital appreciation</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="mf-style">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Passive Funds</h3><ul><li>Replicate a market index</li><li>Invest in same securities and same proportion as index</li><li>No active selection of any stock/sector</li><li>Lower expenses; portfolio modified when index composition changes</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Active Funds</h3><ul><li>Invest in securities and sectors that may offer better return than index</li><li>Actively manage allocation to market securities and cash</li><li>May perform better or worse than the market index</li><li>Incur higher cost than passive funds</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="mf-goal">
+    <div class="pgrid"><span class="pill a">Growth Funds</span><span class="pill a">Income Funds</span><span class="pill a">Liquid Funds</span><span class="pill a">Tax-Saving Funds</span><span class="pill a">Aggressive Growth Funds</span><span class="pill a">Capital Protection Funds</span><span class="pill a">Fixed Maturity Funds</span><span class="pill a">Pension Funds</span></div>
+  </div>
+  <div class="ctc" id="mf-risk">
+    <div class="pgrid"><span class="pill g">Very Low-Risk Funds</span><span class="pill a">Low-Risk Funds</span><span class="pill a">Medium-Risk Funds</span><span class="pill r">High-Risk Funds</span></div>
+  </div>
+  <div class="ctc" id="mf-spec">
+    <div class="pgrid"><span class="pill a">Sector Funds</span><span class="pill a">Index Funds</span><span class="pill a">Funds of Funds</span><span class="pill a">Emerging Market Funds</span><span class="pill a">International/Foreign Funds</span><span class="pill a">Global Funds</span><span class="pill a">Real Estate Funds</span><span class="pill a">Commodity-focused Stock Funds</span><span class="pill a">Market Neutral Funds</span><span class="pill a">Asset Allocation Funds</span><span class="pill a">Exchange-traded Funds (ETFs)</span></div>
+  </div>
+  <div class="ctc" id="mf-mode">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Lump-sum Investment</h3><ul><li>One time investment</li><li>Usually large sum invested in one go</li><li>Investor faces risk of volatility in markets</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Systematic Investment Plan (SIP)</h3><ul><li>Staggered investment</li><li>Period: 6 months, 1/3/5 years</li><li>Specific intervals: monthly, quarterly, half-yearly</li><li>Made on specific dates: e.g. 1st, 5th, 10th, 15th of every month</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="mf-plan">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Growth Option</h3><ul><li>Gains made in portfolio are retained and reflected in NAV</li><li>Realized profit/loss treated as capital gains or loss</li><li>No increase in units except if investor purchases/sells</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Dividend Payout Option</h3><ul><li>Fund declares dividend from realized profits</li><li>Amount and frequency varies; depends on distributable surplus</li><li>NAV falls after dividend payout to the extent of dividend paid</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Dividend Reinvestment Option</h3><ul><li>Dividend is re-invested in same scheme by buying additional units at ex-dividend NAV</li><li>Number of units increases each time a dividend is declared and reinvested</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="s-debtmarket">
+  <div class="shdr"><span class="badge b-u3">Unit III</span><h2>Debt Market</h2><p>Classification, instruments, government securities</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Definition</h3><ul><li>Deals mainly with trading of corporate bond issues</li><li>Also called Bond Market when focused on corporate bonds</li></ul></div>
+  </div>
+  <div class="slbl">Classification of Indian Debt Market</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Government Securities Market (G-Sec)</h3><ul><li>Consists of central and state government securities</li><li>Most dominant category in the Indian debt market</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Bond Market</h3><ul><li>Financial Institutions bonds</li><li>Corporate bonds and debentures</li><li>Public Sector Units (PSU) bonds</li><li>Bonds issued to meet financial requirements at a fixed cost</li></ul></div>
+  </div>
+  <div class="slbl">Debt Instruments</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Government Securities</h3><ul><li>Issued by RBI on behalf of Government of India</li><li>Maturity period: <strong>1 to 30 years</strong></li><li>Fixed interest rate; interests payable <strong>semi-annually</strong></li><li><strong>T-Bills:</strong> issued by RBI for 91, 182, and 364 days</li><li>Dated G-Secs: fixed or floating coupon; tenor 5 to 40 years</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Corporate Bonds</h3><ul><li>From PSUs and private corporations</li><li>Extensive range of tenures up to 15 years; also some perpetual bonds</li><li>Higher risk than G-Secs; depend on corporation, industry, market conditions, rating</li><li>Higher returns than G-Secs</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Other Instruments</h3><ul><li>Certificate of Deposit (CD)</li><li>Commercial Papers (CP)</li><li><em>(Details under Unit I Money Market)</em></li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Price-Yield Relationship of Bond</h3><ul><li>Price and yield relationship between bonds is <strong>not straight line but convex</strong></li><li>When yield increases, price falls (inverse relationship)</li><li>The convexity means the price drop from yield increase is less than the price rise from equal yield decrease</li></ul></div>
+</div>
+
+<div class="sec" id="s-derivatives">
+  <div class="shdr"><span class="badge b-u3">Unit III</span><h2>Derivatives Market</h2><p>Types, features, participants, functions, uses</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Definition</h3><ul><li>Financial instrument whose value is <strong>derived from value of an underlying asset</strong></li><li>Underlying asset: securities, commodities, bullion, currency, livestock, interest rates, stock index, forex rate</li><li>No independent value — entirely derived from underlying asset</li><li>Two types: <strong>Commodity derivatives</strong> and <strong>Financial derivatives</strong></li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Features of Financial Derivatives</h3><ul><li>It is a contract</li><li>Specified obligation</li><li>Direct or exchange traded</li><li>Related to notional amount</li><li>Delivery of underlying asset not involved</li><li>May be used as deferred delivery</li><li>Secondary market instruments</li><li>Exposure to risk</li></ul></div>
+  </div>
+  <div class="ctabs">
+    <button class="ctab act" onclick="ct(this,'d-fwd')">Forwards</button>
+    <button class="ctab" onclick="ct(this,'d-fut')">Futures</button>
+    <button class="ctab" onclick="ct(this,'d-opt')">Options</button>
+    <button class="ctab" onclick="ct(this,'d-swp')">Swaps</button>
+    <button class="ctab" onclick="ct(this,'d-part')">Participants</button>
+    <button class="ctab" onclick="ct(this,'d-fn')">Functions</button>
+    <button class="ctab" onclick="ct(this,'d-uses')">Uses</button>
+  </div>
+  <div class="ctc act" id="d-fwd">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Forward Contracts</h3><ul><li>Customised contract between two entities</li><li>Settlement takes place on a <strong>specific date in the future at today's pre-agreed price</strong></li><li>Negotiated between individual parties (not standardised)</li></ul></div>
+  </div>
+  <div class="ctc" id="d-fut">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Futures Contracts</h3><ul><li>Agreement to buy or sell an asset at a certain time in the future at a certain price</li><li>Special types of forward contracts that are <strong>standardised and exchange-traded</strong></li><li>NSE commenced trading in derivatives with launch of index futures on <strong>June 12, 2000</strong></li><li>Index Options launched <strong>June 4, 2001</strong>; Options on individual securities <strong>July 2, 2001</strong></li><li>Futures on individual securities introduced <strong>November 9, 2001</strong></li></ul></div>
+    <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Commodity Exchanges in India</h3><div class="pgrid"><span class="pill a">MCX — Multi Commodity Exchange</span><span class="pill a">NCDEX — National Commodity and Derivatives Exchange</span><span class="pill a">ICEX — Indian Commodity Exchange</span><span class="pill a">NMCE — National Multi Commodity Exchange</span><span class="pill a">NSE and BSE (since 2018)</span></div></div>
+  </div>
+  <div class="ctc" id="d-opt">
+    <div class="cful"><h3><span class="d" style="background:var(--u4)"></span>Options</h3><ul><li>Give the <strong>right but not the obligation</strong> to buy or sell</li><li><strong>Call Option:</strong> Right but not obligation to <strong>buy</strong> a given quantity at a given price on or before a given future date</li><li><strong>Put Option:</strong> Right but not obligation to <strong>sell</strong> a given quantity at a given price on or before a given date</li><li>Longer-dated options are called <strong>warrants</strong> and are generally traded over-the-counter</li></ul></div>
+  </div>
+  <div class="ctc" id="d-swp">
+    <div class="cful"><h3><span class="d" style="background:var(--u4)"></span>Swaps</h3><ul><li>Private agreements between two parties to <strong>exchange cash flows in the future</strong> according to a prearranged formula</li><li>Can be regarded as portfolios of forward contracts</li><li><strong>Interest Rate Swaps:</strong> Swapping only the interest related cash flows in the same currency</li><li><strong>Currency Swaps:</strong> Swapping both principal and interest in different currencies</li></ul></div>
+  </div>
+  <div class="ctc" id="d-part">
+    <div class="cgrid">
+      <div class="card"><h3><span class="d" style="background:var(--u1)"></span>Hedgers</h3><ul><li>Bears an economic risk and uses futures market to <strong>reduce that risk</strong></li><li>Hedging is a prudent business practice</li><li>Prudent manager has a legal duty to understand and use futures market hedging mechanism</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Speculators</h3><ul><li>Accepts the risk the hedger does not want to take</li><li>Believes potential return outweighs the risk</li><li>Primary purpose of derivatives markets is not speculation — they permit transfer of risk</li></ul></div>
+      <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Arbitrageurs</h3><ul><li>Actively seek out minor pricing discrepancies</li><li>Keep prices in the marketplace efficient</li><li>Efficient market: securities priced in accordance with perceived risk and potential return</li></ul></div>
+    </div>
+  </div>
+  <div class="ctc" id="d-fn">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Functions of Derivatives Markets</h3><ul><li><strong>Discovery of price:</strong> Prices reflect future perceptions of market participants; lead prices of underlying assets to perceived future level</li><li><strong>Risk transfer:</strong> Derivatives market helps to transfer risks</li><li><strong>Linked to cash markets:</strong> Derivatives are linked to underlying cash markets; with introduction of derivatives, underlying market witnesses higher trading volumes</li><li><strong>Check on speculation:</strong> Speculation traders shift to a more controlled environment of derivatives market</li></ul></div>
+  </div>
+  <div class="ctc" id="d-uses">
+    <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Uses of Derivatives</h3><ul><li><strong>Risk aversion tools:</strong> Control, avoid, shift and manage different types of risks through hedging, arbitraging, spreading</li><li><strong>Prediction of future prices:</strong> Serve as barometers of future price trends; discovery of new prices on spot and futures markets</li><li><strong>Enhance liquidity:</strong> Based on margin trading — no immediate full amount required; large number of traders operate, enhancing liquidity and reducing transaction costs</li><li><strong>Assist investors:</strong> Help investors, traders and managers of large funds to devise strategies for proper asset allocation and investment goals</li><li><strong>Integration of price structure:</strong> Smoothen price fluctuations, squeeze price spread, remove gluts and shortages</li><li><strong>Catalyse growth of financial markets:</strong> Encourage competitive trading; increase trading volume in the country</li></ul></div>
+  </div>
+</div>
+
+<!-- ════════════════ UNIT IV ════════════════ -->
+<div class="sec" id="s-merchantbanking">
+  <div class="shdr"><span class="badge b-u4">Unit IV</span><h2>Merchant Banking</h2><p>Definition, functions, categories, SEBI guidelines</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Definition</h3><ul><li>Institution covering a wide range of activities such as underwriting of shares, portfolio management, project counseling, insurance etc.</li><li>Renders services for a fee</li><li>Intermediary between issuers and ultimate purchasers of securities in primary market</li><li>Original purpose: facilitate and/or finance production and trade of commodities</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Merchant Banker</h3><ul><li>Critical link between a company raising funds and the investors</li><li>Underwrites corporate securities; advises on corporate mergers</li><li>May be in form of a bank, company, firm or proprietary concern</li><li>Under statutory framework of <strong>SEBI</strong></li></ul></div>
+  </div>
+  <div class="slbl">Functions of Merchant Banks</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Promotional Activities</h3><ul><li>Help entrepreneur conceive an idea</li><li>Identification of projects</li><li>Preparing feasibility reports</li><li>Obtaining Government approvals and incentives</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Issue Management</h3><ul><li>Effective marketing of corporate securities (equity, preference shares, debentures)</li><li>Intermediary — transfers capital from those who own it to those who need it</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Credit Syndication</h3><ul><li>Obtaining loans from multiple DFIs or a syndicate/consortium</li><li>Helps corporate clients raise syndicated loans from commercial banks</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Project Counseling</h3><ul><li>Preparation of project reports</li><li>Deciding upon financing pattern</li><li>Appraising technical, commercial and financial viability</li><li>Filling application forms for obtaining funds from FIs</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Portfolio Management</h3><ul><li>Effective management of securities</li><li>Advise on investment decisions; tax and inflation considerations</li><li>Buying and selling securities on behalf of client companies</li><li>Maximum returns and minimum risk</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Working Capital Finance</h3><ul><li>Assessment of working capital requirement</li><li>Preparing application for sanction of credit facilities</li><li>Assistance in negotiations with banks</li><li>Advising on issue of debentures for augmenting long term working capital</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Acceptance Credit &amp; Bill Discounting</h3><ul><li>Acceptance and discounting of bills of exchange</li><li>Advancement of loans on strength of such instruments</li><li>Requires good reputation of the firm</li><li>Collecting credit information and credit rating</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Mergers &amp; Acquisitions</h3><ul><li>Negotiating acquisitions and mergers</li><li>Expert valuation regarding quantum and nature of consideration</li><li>Undertaking management audits</li><li>Conducting exploratory studies for overseas markets, foreign collaborations, JVs</li><li>Assisting in legal compliance and capital restructuring</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Off Shore Finance</h3><ul><li>Long-term foreign currency loans</li><li>Joint venture abroad</li><li>Financing exports and imports</li><li>Foreign collaboration arrangements</li></ul></div>
+  </div>
+  <div class="slbl">Merchant Banker Categories (SEBI)</div>
+  <div class="tw"><table><tr><th>Category</th><th>Activities Permitted</th></tr><tr><td>Category 1</td><td>Issue Management, Advisor, Consultant, Manager, Underwriter, Portfolio Manager</td></tr><tr><td>Category 2</td><td>Advisor, Consultant, Co-manager, Underwriter, Portfolio Manager</td></tr><tr><td>Category 3</td><td>Advisor, Consultant, Underwriter</td></tr><tr><td>Category 4</td><td>Advisor, Consultant</td></tr></table></div>
+  <div class="slbl">SEBI Guidelines for Merchant Bankers</div>
+  <div class="cful"><ul><li>SEBI's authorisation is a must to act as merchant banker</li><li><strong>Authorisation criteria:</strong> Professional qualification in finance/law/business management; infrastructure (office, equipment, manpower); capital adequacy; past track record, experience, general reputation and fairness</li><li>Must maintain copies of balance sheet, P&amp;L account, statement of financial position</li><li>Half-yearly unaudited result to be submitted to SEBI</li><li>Prohibited from buying securities based on unpublished price sensitive information of clients</li><li>Must appoint a <strong>'Compliance Officer'</strong> to monitor compliance</li><li>SEBI has the right to inspect books of accounts and records</li><li>Lead manager (Category I) must accept minimum underwriting obligation of <strong>5% of size of issue or Rs. 25 lakhs, whichever is less</strong></li></ul></div>
+</div>
+
+<div class="sec" id="s-factoring">
+  <div class="shdr"><span class="badge b-u4">Unit IV</span><h2>Bill Discounting &amp; Factoring</h2><p>Bill of exchange, bills discounting, factoring concept and mechanism</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Bill of Exchange</h3><ul><li>Instrument in writing which is an <strong>unconditional order to pay a certain amount of money to a specified person</strong></li><li>Commercial bank provides immediate cash by discounting genuine trade bills</li><li>Deducts certain charges as discount</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Factoring Definition</h3><ul><li>Financial service in which a business organisation sells its <strong>Account Receivables</strong> to another person called a <strong>factor</strong>, at a discount to raise money</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u4)"></span>5 Services Provided by Factor</h3><ul><li>Finance</li><li>Maintenance of Debt</li><li>Collection of Debts</li><li>Accounting and Reconciliation</li><li>Protection against credit risk</li></ul></div>
+  <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Factoring Companies in India</h3><div class="pgrid"><span class="pill p">India Factoring and Finance Solutions Pvt. Ltd.</span><span class="pill p">SBI Factors Ltd.</span><span class="pill p">Terkar Capital</span></div></div>
+</div>
+
+<div class="sec" id="s-venturecapital">
+  <div class="shdr"><span class="badge b-u4">Unit IV</span><h2>Venture Capital</h2><p>Meaning, characteristics, stages, VC funds in India</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Meaning</h3><ul><li>Funds made available for <strong>startup firms and small businesses with exceptional growth potential</strong></li><li>Money provided by professionals who invest alongside management in young, rapidly growing companies</li><li>SEBI Regulation 1996: fund established as a company or trust which raises money and makes investments in accordance with the regulations</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>What VC Generally Does</h3><ul><li>Finance new and rapidly growing companies</li><li>Purchase equity securities</li><li>Assist in development of new products or services</li><li>Add value through active participation</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>4 Characteristics</h3><ul><li>Long time horizon</li><li>High risk</li><li>Equity participation</li><li>Participation in management</li></ul></div>
+  </div>
+  <div class="slbl">6 Stages of Financing</div>
+  <div class="tw"><table><tr><th>Stage</th><th>Purpose</th><th>Lock-in Period</th><th>Risk</th></tr><tr><td>1. Seed Money</td><td>Support a concept/idea/R&amp;D for product development</td><td>7–10 years</td><td>Extreme</td></tr><tr><td>2. Start-up</td><td>Initializing operations or developing prototypes</td><td>5–9 years</td><td>Very High</td></tr><tr><td>3. First-Round</td><td>Start commercial production and marketing</td><td>3–7 years</td><td>High</td></tr><tr><td>4. Second-Round</td><td>Expand market and growing working capital needs</td><td>3–5 years</td><td>Sufficiently High</td></tr><tr><td>5. Third-Round (Mezzanine)</td><td>Market expansion, acquisition &amp; product development for profit making company</td><td>1–3 years</td><td>Medium</td></tr><tr><td>6. Fourth-Round (Bridge)</td><td>Facilitating public issue / going public</td><td>1–3 years</td><td>Low</td></tr></table></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>VC Investment Process</h3><ul><li>Deal origination</li><li>Screening</li><li>Due diligence (Evaluation)</li><li>Deal structuring</li><li>Post investment activity</li><li>Exit plan</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Methods of VC Financing</h3><ul><li>Equity</li><li>Conditional loan</li><li>Income note</li><li>Participating debentures</li><li>Quasi equity</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Exit Routes</h3><ul><li>Initial Public Offer (IPO)</li><li>Trade sale</li><li>Promoter buy back</li><li>Acquisition by another company</li></ul></div>
+  </div>
+  <div class="slbl">Development of VC in India</div>
+  <div class="cful"><ul><li>Concept of venture capital formally introduced in India in <strong>1987 by IDBI</strong></li><li>Government levied a 5% cess on all know-how import payments to create the venture fund</li><li>ICICI started VC activity in <strong>1987</strong></li><li>ICICI floated separate VC company — <strong>TDICI — 1988</strong></li></ul></div>
+  <div class="slbl">VC Funds in India — 5 Categories</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u2)"></span>Central Govt DFIs</h3><ul><li>ICICI Venture Funds Ltd.</li><li>IFCI Venture Capital Funds Ltd (IVCF)</li><li>SIDBI Venture Capital Ltd (SVCL)</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u1)"></span>State Govt DFIs</h3><ul><li>Punjab Infotech Venture Fund</li><li>Gujarat Venture Finance Ltd (GVFL)</li><li>Kerala Venture Capital Fund Pvt Ltd.</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Public Banks</h3><ul><li>Canbank Venture Capital Fund</li><li>SBI Capital Market Ltd</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u4)"></span>Private Sector</h3><ul><li>IL&amp;FS Trust Company Ltd</li><li>Infinity Venture India Fund</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Overseas VC Funds</h3><ul><li>Walden International Investment Group</li><li>HSBC Private Equity</li><li>International Management (Mauritius) Ltd</li></ul></div>
+  </div>
+</div>
+
+<!-- ════════════════ UNIT V ════════════════ -->
+<div class="sec" id="s-creditcards">
+  <div class="shdr"><span class="badge b-u5">Unit V</span><h2>Credit Cards</h2><p>Definition, history, transaction process, advantages and disadvantages</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Definition</h3><ul><li>Payment card issued by a bank/financial services company allowing cardholders to <strong>borrow funds</strong> to pay for goods and services</li><li>Cardholders must pay back borrowed money plus applicable interest</li><li>Credit card issuer may also grant a separate <strong>cash line of credit (LOC)</strong></li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>History</h3><ul><li>Use of credit cards originated in <strong>USA during the 1920s</strong> — oil companies and hotel chains began issuing to customers</li><li><strong>1949:</strong> Frank McNamara invented the concept — led to <strong>Diners Club Card</strong></li><li>Started with 27 restaurants, 200 members; by 1953 became first internationally accepted charge card</li><li><strong>1958:</strong> American Express introduced travel and entertainment card</li><li><strong>1959:</strong> American Express introduced embossed plastic cards</li><li><strong>1981:</strong> Credit card market in India started when <strong>Visa issued the card</strong></li><li><strong>Andhra Bank</strong> was pioneer of credit cards in India</li></ul></div>
+  </div>
+  <div class="slbl">Key Players in Credit Card Transaction</div>
+  <div class="cful"><ul><li><strong>Cardholder:</strong> User who obtains credit card from issuing bank; presents card to pay for goods/services</li><li><strong>Merchant:</strong> Business that maintains merchant account to accept credit cards</li><li><strong>Acquiring Bank (Merchant's Bank):</strong> Provides merchants with equipment and software; deposits funds from credit card sales into merchant's account</li><li><strong>Issuing Bank (Cardholder Bank):</strong> Pays acquiring banks for purchases cardholders make; cardholder repays issuing bank</li><li><strong>Card Associations (Visa and MasterCard):</strong> Govern members; set interchange fees and qualification guidelines; act as arbiter between banks; maintain and improve card network</li></ul></div>
+  <div class="ctabs">
+    <button class="ctab act" onclick="ct(this,'cc-auth')">Authorization Process</button>
+    <button class="ctab" onclick="ct(this,'cc-clear')">Clearing &amp; Settlement</button>
+    <button class="ctab" onclick="ct(this,'cc-rep')">Repayment</button>
+    <button class="ctab" onclick="ct(this,'cc-adv')">Advantages</button>
+    <button class="ctab" onclick="ct(this,'cc-dis')">Disadvantages</button>
+    <button class="ctab" onclick="ct(this,'cc-fraud')">Fraud</button>
+  </div>
+  <div class="ctc act" id="cc-auth">
+    <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Authorization Process</h3><ul><li>1. Cardholder begins transaction</li><li>2. Merchant transmits the transaction info</li><li>3. Acquirer/Processor captures and routes info to the Card Network</li><li>4. Visa/MasterCard Network (BankNet/VisaNet) routes between banks</li><li>5. Issuer approval</li><li>6. Visa/MasterCard Network sends response to Acquirer</li><li>7. Merchant receives approval info</li></ul></div>
+  </div>
+  <div class="ctc" id="cc-clear">
+    <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Clearing &amp; Settlement</h3><ul><li>1. Merchant sends batch of approved authorizations to Acquirer</li><li>2. Acquiring bank reconciles and transmits info via the Card Network</li><li>3. Card Network debits the issuing bank's account and credits the acquiring bank's account for net amount; deducts interchange and network fees</li><li>4. The card issuing bank pays the acquiring bank</li><li>5. Cardholder is responsible for repaying purchase amount and interests to Issuing Bank</li></ul></div>
+  </div>
+  <div class="ctc" id="cc-rep">
+    <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Repayment</h3><ul><li>At end of billing cycle, card issuer sends statement showing all transactions, previous balance, new balance, minimum payment due and due date</li><li><strong>Grace period:</strong> Period between date of purchase and due date listed on statement</li><li>If bill paid in full by due date during grace period — <strong>no interest charges accrue</strong></li><li>If balance carried forward — interest is charged</li><li><strong>APR</strong> (Annual Percentage Rate) reflects cost of carrying a balance on annualised basis; includes interest rate and other costs (annual fee etc.)</li></ul></div>
+  </div>
+  <div class="ctc" id="cc-adv">
+    <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Advantages</h3><ul><li><strong>Easy access to credit:</strong> Deferred payment basis — use now, pay later</li><li><strong>Building a line of credit:</strong> Banks use credit card usage to gauge loan applicant's creditworthiness</li><li><strong>EMI facility:</strong> Pay off purchases in equated monthly installments</li><li><strong>Incentives and offers:</strong> Discounts on flight tickets, holidays, large purchases</li><li><strong>Flexible credit:</strong> 45–60 days free short-term credit if full balance paid by due date</li><li><strong>Record of expenses:</strong> Detailed list sent with monthly statement</li><li><strong>Purchase protection:</strong> Insurance for card purchases that might be lost, damaged or stolen</li></ul></div>
+  </div>
+  <div class="ctc" id="cc-dis">
+    <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Disadvantages</h3><ul><li><strong>Minimum due trap:</strong> Card holders deceived into thinking minimum amount is total due — in fact it is the least amount expected</li><li><strong>Hidden costs:</strong> Late payment fees, joining fees, renewal fees, processing fees</li><li><strong>Ease of overuse:</strong> Revolving credit can lead to overspending and cycle of debt</li><li><strong>High interest rate:</strong> Average rate of <strong>3% per month = 36% per annum</strong></li><li><strong>Credit card fraud:</strong> Possible to clone a card and gain access to confidential information</li></ul></div>
+  </div>
+  <div class="ctc" id="cc-fraud">
+    <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Credit Card Fraud &amp; Cyber Crime</h3><ul><li>Credit card fraud = using a credit card to obtain money or goods fraudulently</li><li>Nilson Report 2020: Card Fraud Losses reached <strong>$28.65 Billion</strong></li><li>By 2025: total payment card volume worldwide projected to be <strong>$56.182 trillion</strong></li><li>Gross card fraud globally expected to be <strong>$35.31 billion</strong></li></ul></div>
+  </div>
+</div>
+
+<div class="sec" id="s-securitisation">
+  <div class="shdr"><span class="badge b-u5">Unit V</span><h2>Asset Securitisation</h2><p>Definition, genesis, elements, players, benefits</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Definition</h3><ul><li>Process of pooling and repackaging of <strong>homogeneous illiquid financial assets</strong> into marketable securities that can be sold to investors</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Genesis</h3><ul><li>Severe financial crisis faced by certain states in US during <strong>1969–70</strong></li><li>Federal government restriction on inter-state lending and borrowing</li><li>Raised funds from surplus states by issuing instruments backed by mortgaged properties</li><li>Helped bankers to survive in the market and make additional earnings</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Why Securitisation?</h3><ul><li>Provide efficient access to capital markets</li><li>Minimise issuer-specific limitations on ability to raise capital</li><li>Convert illiquid assets to cash</li><li>Diversify and target funding sources, investor base and transaction structures</li><li>Raise capital to generate additional assets</li><li>Raise capital without prospectus-type disclosure</li><li>Transfer risk to third parties</li></ul></div>
+  <div class="slbl">3 Elements of Securitisation</div>
+  <div class="cful"><ul><li>1. Conversion of existing illiquid assets (loans, advances, receivables) into tradable security</li><li>2. Making portfolio of assets to issue securities — called <strong>reference portfolio</strong></li><li>3. Reconverting them into fresh assets through capital market operations</li></ul></div>
+  <div class="slbl">Players and their Roles</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Originator</h3><ul><li>Entity making loans to borrowers or having receivables from customers</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>SPV (Special Purpose Vehicle)</h3><ul><li>Buys assets from Originator and packages them into security for further sale</li><li>Separates risk of assets from credit risk of the seller</li><li><strong>Bankruptcy remote entity</strong></li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Other Players</h3><ul><li><strong>Credit Rating Agency:</strong> Provides value addition to security</li><li><strong>Insurance Company/Underwriters:</strong> Cover against redemption risk to investor and/or under-subscription</li><li><strong>Obligors:</strong> Whose debts and collateral constitute underlying assets</li><li><strong>Investor:</strong> Party to whom securities are sold</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>Eligible Collaterals — Must be Homogeneous in:</h3><div class="pgrid"><span class="pill r">Underlying assets</span><span class="pill r">Maturity period</span><span class="pill r">Cash flow profile</span></div><div class="slbl" style="margin-top:.5rem">Eligible Loans</div><div class="pgrid"><span class="pill g">Housing finance</span><span class="pill g">Term loan finance</span><span class="pill g">Car loan</span><span class="pill g">Credit card receivables</span><span class="pill g">Export credit</span></div></div>
+  <div class="cful"><h3><span class="d" style="background:var(--u1)"></span>7 Benefits of Securitisation</h3><ul><li>Separates credit risk of assets from credit risk of Originator</li><li>Lower cost of borrowing for Originator</li><li>Illiquid assets converted into marketable securities — alternate funding source</li><li>Remove assets from balance sheet → improve capital adequacy</li><li>Increase operations in particular portfolio without increasing total exposure</li><li>Creates highly diversified portfolio in terms of assets and geography</li><li>Dependability of cash flows from assets as signified by ageing of portfolio</li></ul></div>
+</div>
+
+<div class="sec" id="s-creditrating">
+  <div class="shdr"><span class="badge b-u5">Unit V</span><h2>Credit Rating</h2><p>Meaning, nature, types, factors analyzed, rating systems</p></div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Meaning</h3><ul><li>Opinion on the relative degree of risk associated with <strong>timely payment of interest and principal on a debt instrument</strong></li><li>Assessment of an entity's ability to pay its financial obligations</li><li>Based on financial history and current assets and liabilities</li><li>Determined by Credit Rating Agencies</li><li>Tells lender/investor the probability of the subject being able to pay back a loan</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>Nature of Credit Rating</h3><ul><li>Rating is based on information</li><li>Many factors affect rating: Quality of Management, Corporate Strategy, International Environment</li><li>Rating by more than one agency</li><li>Publication of ratings</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u3)"></span>Types</h3><ul><li><strong>Sovereign Credit Rating:</strong> Sovereign entity; risk level of investing environment; used by investors looking to invest abroad; takes political risk into account</li><li><strong>Corporate Credit Rating:</strong> Financial indicator to potential investors of debt securities such as bonds</li></ul></div>
+  </div>
+  <div class="slbl">6 Factors Analyzed for Rating</div>
+  <div class="cgrid">
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>1. Business Risk Analysis</h3><ul><li>Country and macroeconomic risk</li><li>Industry risk</li><li>Competitive position (Market position, Diversification, Operating efficiency, Ownership/governance, Profitability)</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>2. Financial Analysis</h3><ul><li>Accounting</li><li>Cash flow adequacy</li><li>Financial governance and policies/risk tolerance</li><li>Liquidity/Short-term factors</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>3. Management Evaluation</h3><ul><li>Management goals, plans and strategies</li><li>Capacity to overcome unfavorable conditions</li><li>Staff experience and skills, planning and control system</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>4. Geographical Analysis</h3><ul><li>Diversification</li><li>Subsidies from the government</li><li>Undertaken to determine locational advantages</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>5. Regulatory &amp; Competitive Environment</h3><ul><li>Evaluate impact of regulation/deregulation on the issuer company</li></ul></div>
+    <div class="card"><h3><span class="d" style="background:var(--u5)"></span>6. Fundamental Analysis</h3><ul><li>Liquidity management</li><li>Profitability and financial position</li><li>Interest and tax rates sensitivity of the company</li></ul></div>
+  </div>
+  <div class="cful"><h3><span class="d" style="background:var(--u3)"></span>Rating System</h3><ul><li>Usually expressed in alphabetical or alphanumeric symbols</li><li>Symbols help differentiate between debt instruments on basis of underlying credit quality</li><li><strong>International agencies:</strong> Fitch IBCA, Moody's, Standard &amp; Poor's — sell credit rating analysis</li><li>Focus on default risk, not exchange rate risk</li><li>Assessing sovereign debt focuses on political risk and economic risk</li></ul></div>
+  <div class="cful"><h3><span class="d" style="background:var(--u5)"></span>Indian Credit Rating Agencies</h3><div class="pgrid"><span class="pill r">CRISIL — Credit Rating and Information Services of India Ltd.</span><span class="pill r">ICRA — Investment Information and Credit Rating Agency of India Ltd.</span><span class="pill r">CARE — Credit Analysis and Research Ltd.</span></div></div>
+</div>
+
+</div><!-- /con-pnl -->
+</div><!-- /layout -->
+
+<script>
+const TREE=[
+  {id:'root',label:'FIS — All 5 Units',u:'all',ch:[
+    {id:'u1',label:'UNIT I — Financial System',u:'u1',ch:[
+      {id:'finsystem',label:'Financial System',u:'u1',s:'s-finsystem',ch:[]},
+      {id:'indfs',label:'Indian Financial System',u:'u1',s:'s-indfs',ch:[]},
+      {id:'instruments',label:'Financial Instruments / Assets',u:'u1',s:'s-instruments',ch:[]},
+      {id:'finmarkets',label:'Financial Markets',u:'u1',s:'s-finmarkets',ch:[
+        {id:'capitalmarket',label:'Capital Market',u:'u1',s:'s-capitalmarket',ch:[]},
+        {id:'moneymarket',label:'Money Market',u:'u1',s:'s-moneymarket',ch:[]},
+      ]},
+      {id:'growth',label:'Growth / Reforms',u:'u1',s:'s-growth',ch:[]},
+    ]},
+    {id:'u2',label:'UNIT II — Financial Institutions',u:'u2',ch:[
+      {id:'fioverview',label:'FIs — Overview',u:'u2',s:'s-fi-overview',ch:[]},
+      {id:'banking',label:'Banking Institutions (7 Types)',u:'u2',s:'s-banking',ch:[
+        {id:'centralbank',label:'Central Bank (RBI)',u:'u2',s:'s-centralbank',ch:[]},
+      ]},
+      {id:'nbfc',label:'NBFCs',u:'u2',s:'s-nbfc',ch:[]},
+      {id:'regulators',label:'Regulatory Bodies',u:'u2',s:'s-regulators',ch:[]},
+      {id:'regprinciples',label:'Regulation Principles (7)',u:'u2',s:'s-regprinciples',ch:[]},
+    ]},
+    {id:'u3',label:'UNIT III — Mutual Funds, Debt, Derivatives',u:'u3',ch:[
+      {id:'mutualfunds',label:'Mutual Funds',u:'u3',s:'s-mutualfunds',ch:[]},
+      {id:'debtmarket',label:'Debt Market',u:'u3',s:'s-debtmarket',ch:[]},
+      {id:'derivatives',label:'Derivatives Market',u:'u3',s:'s-derivatives',ch:[]},
+    ]},
+    {id:'u4',label:'UNIT IV — Merchant Banking, Factoring, VC',u:'u4',ch:[
+      {id:'merchantbanking',label:'Merchant Banking',u:'u4',s:'s-merchantbanking',ch:[]},
+      {id:'factoring',label:'Bill Discounting &amp; Factoring',u:'u4',s:'s-factoring',ch:[]},
+      {id:'venturecapital',label:'Venture Capital',u:'u4',s:'s-venturecapital',ch:[]},
+    ]},
+    {id:'u5',label:'UNIT V — Credit Cards, Securitisation, Credit Rating',u:'u5',ch:[
+      {id:'creditcards',label:'Credit Cards',u:'u5',s:'s-creditcards',ch:[]},
+      {id:'securitisation',label:'Asset Securitisation',u:'u5',s:'s-securitisation',ch:[]},
+      {id:'creditrating',label:'Credit Rating',u:'u5',s:'s-creditrating',ch:[]},
+    ]},
+  ]}
+];
+
+function renderTree(nodes,ul,lv){
+  nodes.forEach(n=>{
+    const li=document.createElement('li');
+    const hasCh=n.ch&&n.ch.length>0;
+    const lbl=document.createElement('div');
+    lbl.className='tl';
+    lbl.dataset.u=n.u||'all';
+    lbl.dataset.id=n.id;
+    lbl.dataset.s=n.s||'';
+    lbl.innerHTML=`<span class="dot"></span><span>${n.label}</span>${hasCh?'<span class="arr">▶</span>':''}`;
+    lbl.addEventListener('click',()=>{
+      if(hasCh){lbl.classList.toggle('exp');childUl&&childUl.classList.toggle('open')}
+      if(n.s)showSec(n.s,lbl);
+    });
+    li.appendChild(lbl);
+    let childUl;
+    if(hasCh){
+      childUl=document.createElement('ul');
+      childUl.className='tree-children';
+      renderTree(n.ch,childUl,lv+1);
+      li.appendChild(childUl);
+    }
+    ul.appendChild(li);
+  });
+}
+
+function showSec(id,lbl){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('act'));
+  document.getElementById('ph').style.display='none';
+  const s=document.getElementById(id);
+  if(s)s.classList.add('act');
+  document.querySelectorAll('.tl').forEach(l=>l.classList.remove('act'));
+  if(lbl)lbl.classList.add('act');
+  document.getElementById('cpnl').scrollTo({top:0,behavior:'smooth'});
+}
+
+function ct(el,cid){
+  const par=el.closest('.sec')||document.getElementById('cpnl');
+  el.closest('.ctabs').querySelectorAll('.ctab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  par.querySelectorAll('.ctc').forEach(c=>{
+    if(c.id&&el.closest('.ctabs').nextElementSibling&&c.closest('.sec')===el.closest('.sec'))c.classList.remove('act');
+  });
+  // find all sibling ctc within same sec
+  const sec=el.closest('.sec');
+  if(sec)sec.querySelectorAll('.ctc').forEach(c=>c.classList.remove('act'));
+  const t=document.getElementById(cid);
+  if(t)t.classList.add('act');
+}
+
+function filterU(el){
+  document.querySelectorAll('.utab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  const u=el.dataset.u;
+  // expand that unit branch
+  if(u!=='all'){
+    const lbl=[...document.querySelectorAll('.tl')].find(l=>l.dataset.id===u);
+    if(lbl&&!lbl.classList.contains('exp')){lbl.click();}
+  }
+}
+
+const treeEl=document.getElementById('tree');
+renderTree(TREE,treeEl,0);
+// auto-expand root and u1
+setTimeout(()=>{
+  const root=document.querySelector('.tl[data-id="root"]');
+  if(root)root.click();
+  setTimeout(()=>{
+    const u1=document.querySelector('.tl[data-id="u1"]');
+    if(u1)u1.click();
+  },80);
+},50);
+</script>
+</body>
+</html>
